@@ -1,0 +1,7 @@
+python-dotenv
+authlib
+pandas
+streamlit
+matplotlib
+plotly
+scipy
