@@ -245,6 +245,25 @@ cols[2].metric("Matchup results changed", value=changed_matchups,
                help="The number (and percentage) of matchup results that would "
                     "change due under the new defense scoring settings.")
 
+cols = st.columns(3)
+total_points = (matchup_df["team_1_score"] + matchup_df["team_2_score"]).sum()
+defense_points = (matchup_df["team_1_current_defense_score"] + matchup_df["team_2_current_defense_score"]).sum()
+new_total_points = (matchup_df["team_1_new_score"] + matchup_df["team_2_new_score"]).sum()
+new_defense_points = (matchup_df["team_1_new_defense_score"] + matchup_df["team_2_new_defense_score"]).sum()
+current_pct = defense_points / total_points
+new_pct = new_defense_points / new_total_points
+cols[0].metric("Current DEF % of total", value=f"{current_pct:.2%}",
+               help="The percentage of total weekly points that a defense contributes "
+                    "on average using our league's current settings. Only includes "
+                    "defenses that were active in our league. (Note that we have 10 "
+                    "starting slots on our active rosters.)")
+cols[1].metric("New DEF % of total", value=f"{new_pct:.2%}",
+               delta=f"{new_pct - current_pct:.2%}", delta_color="off",
+               help="The percentage of total weekly points that a defense contributes "
+                    "on average using the user supplied settings from the sidebar. Only "
+                    "includes defenses that were active in our league. (Note that we "
+                    "have 10 starting slots on our active rosters.)")
+
 hist_data = [df["current_defense_score"], df["new_defense_score"]]
 group_labels = ["current settings", "new settings"]
 fig = ff.create_distplot(hist_data, group_labels)
