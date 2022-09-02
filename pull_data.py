@@ -322,6 +322,35 @@ with open("./data/matchup_history.json", "w") as f:
     json.dump(matchup_history, f, indent=2)
 
 
+###################################
+# get defense stats for 2021 season
+###################################
+
+logger.info("==== pulling defense stats for 2021 season ====")
+league_key = [x["league_key"] for x in get_leagues() if x["season"] == "2021"][0]
+# query returns max of 25 players at a time, so need to run it twice to get all defenses
+data_dict = defaultdict(list)
+for start in [0, 25]:
+    _tmp = call_yahoo_api(f"league/{league_key}/players;position=DEF;start={start}/stats")
+    _tmp = _tmp["fantasy_content"]["league"][1]["players"]
+    _tmp = _remove_count_key(_tmp)
+    for _, data in _tmp.items():
+        data_dict["player_key"].append(data["player"][0][0]["player_key"])
+        data_dict["team"].append(data["player"][0][6]["editorial_team_full_name"])
+        data_dict["api_points"].append(float(data["player"][1]["player_points"]["total"]))
+        for x in stat_dict:
+            try:
+                val = [float(y["stat"]["value"])
+                       for y in data["player"][1]["player_stats"]["stats"]
+                       if y["stat"]["stat_id"] == x][0]
+            except IndexError:
+                val = 0
+            data_dict[x].append(val)
+
+df = pd.DataFrame(data_dict)
+df.to_csv("./data/defense_stats_2021.csv", index=False)
+
+
 ########################
 # get weekly team scores
 ########################

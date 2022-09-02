@@ -15,6 +15,7 @@ st.title("Fantasy Football Defense Settings")
 ###########
 
 df = pd.read_csv("./data/data.csv")
+d_stats = pd.read_csv("./data/defense_stats_2021.csv")
 
 with open("./data/current_settings.json", "r") as f:
     CURRENT_SETTINGS = json.load(f)
@@ -165,6 +166,8 @@ def choose_winner(row: pd.Series, score_1_col: str, score_2_col: str) -> int:
         return 0  # tie
 
 
+d_stats["current defense score"] = d_stats.apply(calculate_defense_score, settings=CURRENT_SETTINGS, axis=1)
+d_stats["new defense score"] = d_stats.apply(calculate_defense_score, settings=CUSTOM_SETTINGS, axis=1)
 df["current_defense_score"] = df.apply(calculate_defense_score, settings=CURRENT_SETTINGS, axis=1)
 df["new_defense_score"] = df.apply(calculate_defense_score, settings=CUSTOM_SETTINGS, axis=1)
 
@@ -247,6 +250,21 @@ group_labels = ["current settings", "new settings"]
 fig = ff.create_distplot(hist_data, group_labels)
 fig.update_layout(title_text="Weekly DEF points distribution")
 st.write(fig)
+
+
+######################
+# defense stats impact
+######################
+
+st.write("### 2021 defense season scores")
+d_stats["points change"] = d_stats["new defense score"] - d_stats["current defense score"]
+d_stats["current rank"] = d_stats["current defense score"].rank(method="min", ascending=False).astype(int)
+d_stats["new rank"] = d_stats["new defense score"].rank(method="min", ascending=False).astype(int)
+d_stats["rank change"] = d_stats["current rank"] - d_stats["new rank"]
+out = d_stats[["team", "current rank", "new rank", "rank change",
+               "current defense score", "new defense score", "points change"]]
+out = out.sort_values("new rank")
+st.dataframe(out.set_index("team"))
 
 
 ##################
