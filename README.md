@@ -5,3 +5,4 @@ Take matchups from previous years, rescore them with different scoring settings,
 
 App is build using streamlit.
 Data was pulled using the Yahoo fantasy sports API.
+https://djcunningham0-fantasy-football-defense-scoring-app-mqlndq.streamlitapp.com/
