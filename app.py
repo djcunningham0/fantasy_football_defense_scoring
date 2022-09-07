@@ -9,6 +9,7 @@ from collections import defaultdict
 
 
 st.title("Fantasy Football Defense Settings")
+st.set_page_config(page_title="Fantasy Football Defense Settings")
 
 ###########
 # Load data
