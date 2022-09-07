@@ -482,7 +482,11 @@ def get_team_dicts(row: pd.Series) -> Tuple[dict, dict]:
     return out[0], out[1]
 
 
-def create_matchup_card(team_1: dict, team_2: dict, week: int, year: int):
+def create_matchup_card(row: pd.Series) -> str:
+    team_1, team_2 = get_team_dicts(row)
+    week = row["week"]
+    year = row["year"]
+    league_key = row["league_key"]
     game_id = league_key.split(".")[-1]
     team_1_number = team_1["team_key"].split(".")[-1]
     team_2_number = team_2["team_key"].split(".")[-1]
@@ -598,6 +602,5 @@ with st.expander(expanded=True, label="View the matchups that would be affected 
 
     for i, row in matchup_subset.iterrows():
         league_key = row["league_key"]
-        team_1, team_2 = get_team_dicts(row)
-        card = create_matchup_card(team_1=team_1, team_2=team_2, week=row["week"], year=row["year"])
+        card = create_matchup_card(row)
         st.markdown(card, unsafe_allow_html=True)
